@@ -15,38 +15,25 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    signingConfigs {
-        debug {
-            File strFile = new File("/uhf-serial_release.jks")
-            storeFile file(strFile)
-            storePassword "123456"
-            keyPassword "123456"
-            keyAlias "uhf-serial-key"
-        }
-        release {
-            File strFile = new File("/uhf-serial_release.jks")
-            storeFile file(strFile)
-            storePassword "123456"
-            keyPassword "123456"
-            keyAlias "uhf-serial-key"
-        }
-    }
+
+    // Signing 설정 제거 - 대학교 프로젝트용으로는 기본 debug 서명으로 충분
+    // signingConfigs 섹션 전체 제거
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            // signingConfig 제거
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         debug {
-            signingConfig signingConfigs.debug
+            // signingConfig 제거
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
-        // 自定义apk名称
+        // APK 이름 사용자 정의
         android.applicationVariants.all { variant ->
             variant.outputs.all {
                 outputFileName = "UHF-serial_v${defaultConfig.versionName}.apk"
@@ -67,6 +54,16 @@ android {
         checkReleaseBuilds false
         abortOnError false
     }
+
+    packagingOptions {
+        pickFirst '**/libc++_shared.so'
+        pickFirst '**/libjsc.so'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+    }
 }
 
 dependencies {
@@ -76,6 +73,19 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    
+    // AWS IoT SDK 추가
+    implementation 'com.amazonaws:aws-android-sdk-iot:2.77.0'
+    implementation 'com.amazonaws:aws-android-sdk-mobile-client:2.77.0'
+    
+    // 추가 네트워킹 라이브러리
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
+    implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
+    
+    // 바코드 스캔 라이브러리 추가
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    implementation 'com.google.zxing:core:3.5.1'
+    
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'

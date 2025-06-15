@@ -1,41 +1,93 @@
-<androidx.fragment.app.FragmentTabHost  xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@android:id/tabhost"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#f5f5f5"
+    android:gravity="center"
+    android:padding="32dp">
 
+    <!-- 타이틀 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RFID TQ System"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="#2c3e50"
+        android:layout_marginBottom="48dp" />
+
+    <!-- 버튼 컨테이너 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
 
-        <HorizontalScrollView
-            android:id="@+id/hScroller_mytabhostactivity"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:fadingEdge="none"
-            android:saveEnabled="false"
-            android:scrollbars="horizontal" >
-            <TabWidget
-                android:id="@android:id/tabs"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" />
-        </HorizontalScrollView>
+        <!-- TQ 버튼 -->
+        <Button
+            android:id="@+id/btnTQ"
+            android:layout_width="280dp"
+            android:layout_height="80dp"
+            android:text="TQ"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/btn_tq_background"
+            android:layout_marginBottom="24dp"
+            android:elevation="8dp" />
 
+        <!-- BIN 버튼 -->
+        <Button
+            android:id="@+id/btnBIN"
+            android:layout_width="280dp"
+            android:layout_height="80dp"
+            android:text="BIN"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/btn_bin_background"
+            android:layout_marginBottom="24dp"
+            android:elevation="8dp" />
 
-
-        <FrameLayout
-            android:id="@android:id/tabcontent"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="0" />
-
-        <FrameLayout
-            android:id="@+id/realtabcontent"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+        <!-- PICK 버튼 -->
+        <Button
+            android:id="@+id/btnPICK"
+            android:layout_width="280dp"
+            android:layout_height="80dp"
+            android:text="PICK"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/btn_pick_background"
+            android:elevation="8dp" />
 
     </LinearLayout>
 
-</androidx.fragment.app.FragmentTabHost >
+    <!-- 상태 표시 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="48dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AWS IoT 상태: "
+            android:textSize="14sp"
+            android:textColor="#7f8c8d" />
+
+        <TextView
+            android:id="@+id/tvIotStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="연결 중..."
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#e74c3c" />
+
+    </LinearLayout>
+
+</LinearLayout>

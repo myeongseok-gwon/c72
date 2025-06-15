@@ -59,7 +59,7 @@ public class UHFMainActivity extends BaseTabFragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_uhf_main);
         checkReadWritePermission();
         setTitle(String.format(getString(R.string.app_name) + "(v%s)", getVerName()));
         initSound();

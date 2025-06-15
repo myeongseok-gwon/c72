@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.example.uhf.R;
 import com.example.uhf.activity.UHFMainActivity;
+import com.example.uhf.iot.AwsIotManager;
 import com.example.uhf.tools.CheckUtils;
 import com.example.uhf.tools.NumberTool;
 import com.example.uhf.tools.StringUtils;
@@ -40,12 +41,21 @@ import com.rscja.deviceapi.entity.InventoryParameter;
 import com.rscja.deviceapi.entity.UHFTAGInfo;
 import com.rscja.deviceapi.interfaces.IUHFInventoryCallback;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 
 public class UHFReadTagFragment extends KeyDwonFragment {
     private static final String TAG = "UHFReadTagFragment";
-    //private boolean loopFlag = false;
+    
+    // AWS IoT 관련
+    private AwsIotManager awsIotManager;
+    private TextView tvIotStatus;
+    private Button btConnectIot;
+    private CheckBox cbAutoPublish;
+    
+    // 기존 코드
     private int inventoryFlag = 1;
     MyAdapter adapter;
     Button BtClear;
@@ -56,9 +66,7 @@ public class UHFReadTagFragment extends KeyDwonFragment {
 
     private CheckBox cbFilter, cbPhase;
     private ViewGroup layout_filter;
-
     private CheckBox cbEPC_Tam;
-
 
     long maxRunTime = 36000000L;//毫秒
     EditText etTime;
@@ -69,12 +77,18 @@ public class UHFReadTagFragment extends KeyDwonFragment {
     private int total;
 
     private final int MSG_STOP = 3;
+    private final int MSG_IOT_STATUS_UPDATE = 4;
+    
     Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == 1) {
                 UHFTAGInfo info = (UHFTAGInfo) msg.obj;
                 addDataToList(info);
+                
+                // AWS IoT로 이벤트 발송 (연속 스캔 모드에서도 작동)
+                publishRfidEventInLoop(info);
+                
             } else if (msg.what == 2) {
                 if (mContext.loopFlag) {
                     handler.sendEmptyMessageDelayed(2, 10);
@@ -84,8 +98,9 @@ public class UHFReadTagFragment extends KeyDwonFragment {
                 }
             } else if (msg.what == MSG_STOP) {
                 stopInventory();
+            } else if (msg.what == MSG_IOT_STATUS_UPDATE) {
+                updateIotStatusDisplay();
             }
-
         }
     };
 
@@ -103,6 +118,12 @@ public class UHFReadTagFragment extends KeyDwonFragment {
     public void onDestroyView() {
         super.onDestroyView();
         mContext.mReader.setInventoryCallback(null);
+        
+        // AWS IoT 연결 해제
+        if (awsIotManager != null) {
+            awsIotManager.disconnect();
+        }
+        
         Log.i(TAG, "onDestroyView");
         if (playSoundThread != null) {
             playSoundThread.stopPlay();
@@ -117,6 +138,24 @@ public class UHFReadTagFragment extends KeyDwonFragment {
         mContext = (UHFMainActivity) getActivity();
         mContext.currentFragment = this;
 
+        // 기존 UI 요소들 초기화
+        initializeUIElements();
+        
+        // AWS IoT UI 요소들 초기화
+        initializeAwsIotUI();
+        
+        // AWS IoT 매니저 초기화
+        initializeAwsIot();
+
+        initFilter(getView());
+        initEPCTamperAlarm(getView());
+        
+        tv_count.setText(mContext.tagList.size() + "");
+        tv_total.setText(total + "");
+        Log.i(TAG, "UHFReadTagFragment.EtCountOfTags=" + tv_count.getText());
+    }
+    
+    private void initializeUIElements() {
         BtClear = (Button) getView().findViewById(R.id.BtClear);
         tvTime = (TextView) getView().findViewById(R.id.tvTime);
         tvTime.setText("0s");
@@ -152,14 +191,153 @@ public class UHFReadTagFragment extends KeyDwonFragment {
         BtClear.setOnClickListener(new BtClearClickListener());
         RgInventory.setOnCheckedChangeListener(new RgInventoryCheckedListener());
         BtInventory.setOnClickListener(new BtInventoryClickListener());
+    }
+    
+    private void initializeAwsIotUI() {
+        // AWS IoT 상태 표시 텍스트뷰 (기존 레이아웃에 추가해야 함)
+        // tvIotStatus = (TextView) getView().findViewById(R.id.tvIotStatus);
+        // btConnectIot = (Button) getView().findViewById(R.id.btConnectIot);
+        // cbAutoPublish = (CheckBox) getView().findViewById(R.id.cbAutoPublish);
+        
+        // 임시로 토스트로 상태 표시 (실제로는 레이아웃에 UI 요소 추가 필요)
+        if (tvIotStatus != null) {
+            tvIotStatus.setText("IoT 상태: 연결 해제됨");
+            tvIotStatus.setTextColor(Color.RED);
+        }
+        
+        if (btConnectIot != null) {
+            btConnectIot.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    connectToAwsIot();
+                }
+            });
+        }
+        
+        // cbAutoPublish가 null인 경우 기본값으로 자동 발송 활성화
+        if (cbAutoPublish != null) {
+            cbAutoPublish.setChecked(true);
+        }
+        
+        Log.i(TAG, "AWS IoT UI 초기화 완료 - AutoPublish: " + (cbAutoPublish != null ? cbAutoPublish.isChecked() : "true(default)"));
+    }
+    
+    private void initializeAwsIot() {
+        awsIotManager = new AwsIotManager(mContext);
+        // 자동으로 AWS IoT에 연결 시도
+        connectToAwsIot();
+    }
+    
+    private void connectToAwsIot() {
+        Toast.makeText(mContext, "AWS IoT Core 연결 중...", Toast.LENGTH_SHORT).show();
+        
+        awsIotManager.connectWithCertificate(new AwsIotManager.ConnectionCallback() {
+            @Override
+            public void onConnectionSuccess() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mContext, "AWS IoT Core 연결 성공!", Toast.LENGTH_SHORT).show();
+                        updateIotStatusDisplay();
+                    }
+                });
+            }
 
-        initFilter(getView());
+            @Override
+            public void onConnectionFailure(Exception exception) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mContext, "AWS IoT Core 연결 실패: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                        updateIotStatusDisplay();
+                    }
+                });
+            }
+        });
+    }
+    
+    private void updateIotStatusDisplay() {
+        if (tvIotStatus != null) {
+            if (awsIotManager != null && awsIotManager.isConnected()) {
+                tvIotStatus.setText("IoT 상태: 연결됨");
+                tvIotStatus.setTextColor(Color.GREEN);
+            } else {
+                tvIotStatus.setText("IoT 상태: 연결 해제됨");
+                tvIotStatus.setTextColor(Color.RED);
+            }
+        }
+    }
+    
+    private void publishRfidEvent(UHFTAGInfo info) {
+        if (awsIotManager == null || !awsIotManager.isConnected()) {
+            Log.w(TAG, "AWS IoT가 연결되지 않아 이벤트를 발송할 수 없습니다.");
+            return;
+        }
+        
+        // 타임스탬프 생성
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        String timestamp = sdf.format(new Date());
+        
+        // RFID 이벤트 발송
+        awsIotManager.publishRfidScanEvent(
+            info.getEPC(),
+            info.getRssi(),
+            timestamp,
+            new AwsIotManager.PublishCallback() {
+                @Override
+                public void onPublishSuccess() {
+                    Log.i(TAG, "RFID 이벤트 발송 성공: " + info.getEPC());
+                }
 
-        initEPCTamperAlarm(getView());
-        //clearData();
-        tv_count.setText(mContext.tagList.size() + "");
-        tv_total.setText(total + "");
-        Log.i(TAG, "UHFReadTagFragment.EtCountOfTags=" + tv_count.getText());
+                @Override
+                public void onPublishFailure(Exception exception) {
+                    Log.e(TAG, "RFID 이벤트 발송 실패: " + exception.getMessage());
+                }
+            }
+        );
+    }
+    
+    /**
+     * 연속 스캔 모드에서 AWS IoT 이벤트 발송
+     * Handler 스레드에서 호출되므로 UI 스레드 체크 불필요
+     */
+    private void publishRfidEventInLoop(UHFTAGInfo info) {
+        // 연결 상태 체크
+        if (awsIotManager == null || !awsIotManager.isConnected()) {
+            Log.w(TAG, "Loop 모드: AWS IoT 연결되지 않음");
+            return;
+        }
+        
+        // 자동 발송 활성화 체크 (cbAutoPublish가 null이면 기본적으로 활성화)
+        boolean autoPublishEnabled = (cbAutoPublish == null) || cbAutoPublish.isChecked();
+        if (!autoPublishEnabled) {
+            Log.d(TAG, "Loop 모드: 자동 발송 비활성화됨");
+            return;
+        }
+        
+        Log.i(TAG, "Loop 모드: RFID 이벤트 발송 시도 - EPC: " + info.getEPC());
+        
+        // 타임스탬프 생성
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        String timestamp = sdf.format(new Date());
+        
+        // RFID 이벤트 발송
+        awsIotManager.publishRfidScanEvent(
+            info.getEPC(),
+            info.getRssi(),
+            timestamp,
+            new AwsIotManager.PublishCallback() {
+                @Override
+                public void onPublishSuccess() {
+                    Log.i(TAG, "✅ Loop 모드 RFID 이벤트 발송 성공: " + info.getEPC());
+                }
+
+                @Override
+                public void onPublishFailure(Exception exception) {
+                    Log.e(TAG, "❌ Loop 모드 RFID 이벤트 발송 실패: " + exception.getMessage());
+                }
+            }
+        );
     }
 
     private Button btnSetFilter;
@@ -211,19 +389,19 @@ public class UHFReadTagFragment extends KeyDwonFragment {
                 }
                 etLen.getText().toString();
                 if (etLen.getText().toString().isEmpty()) {
-                    mContext.showToast("数据长度不能为空");
+                    mContext.showToast("데이터 길이를 입력하세요");
                     return;
                 }
                 etOffset.getText().toString();
                 if (etOffset.getText().toString().isEmpty()) {
-                    mContext.showToast("起始地址不能为空");
+                    mContext.showToast("시작 주소를 입력하세요");
                     return;
                 }
                 int ptr = StringUtils.toInt(etOffset.getText().toString(), 0);
                 int len = StringUtils.toInt(etLen.getText().toString(), 0);
                 String data = etData.getText().toString().trim();
                 if (len > 0) {
-                    String rex = "[\\da-fA-F]*"; //匹配正则表达式，数据为十六进制格式
+                    String rex = "[\\da-fA-F]*";
                     if (data.isEmpty() || !data.matches(rex)) {
                         mContext.showToast(getString(R.string.uhf_msg_filter_data_must_hex));
                         return;
@@ -235,7 +413,6 @@ public class UHFReadTagFragment extends KeyDwonFragment {
                         mContext.showToast(R.string.uhf_msg_set_filter_fail);
                     }
                 } else {
-                    //禁用过滤
                     String dataStr = "";
                     if (mContext.mReader.setFilter(RFIDWithUHFUART.Bank_EPC, 0, 0, dataStr)
                             && mContext.mReader.setFilter(RFIDWithUHFUART.Bank_TID, 0, 0, dataStr)
@@ -246,9 +423,9 @@ public class UHFReadTagFragment extends KeyDwonFragment {
                     }
                 }
                 cbFilter.setChecked(false);
-
             }
         });
+        
         CheckBox cb_filter = (CheckBox) view.findViewById(R.id.cb_filter);
         rbEPC.setOnClickListener(new OnClickListener() {
             @Override
@@ -294,15 +471,11 @@ public class UHFReadTagFragment extends KeyDwonFragment {
     public void onPause() {
         Log.i(TAG, "UHFReadTagFragment.onPause");
         super.onPause();
-
-        // 停止识别
         stopInventory();
     }
 
     /**
-     * 添加数据到列表中
-     *
-     * @param
+     * 리스트에 데이터 추가
      */
     private void addDataToList(UHFTAGInfo info) {
         String epc = info.getEPC();
@@ -342,18 +515,12 @@ public class UHFReadTagFragment extends KeyDwonFragment {
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
             if (checkedId == RbInventorySingle.getId()) {
-                // 单步识别
                 inventoryFlag = 0;
-//                cbFilter.setChecked(false);
-//                cbFilter.setVisibility(View.INVISIBLE);
             } else if (checkedId == RbInventoryLoop.getId()) {
-                // 单标签循环识别
                 inventoryFlag = 1;
-//                cbFilter.setVisibility(View.VISIBLE);
             }
         }
     }
-
 
     public class BtInventoryClickListener implements OnClickListener {
         @Override
@@ -364,21 +531,25 @@ public class UHFReadTagFragment extends KeyDwonFragment {
 
     private void readTag() {
         cbFilter.setChecked(false);
-        if (BtInventory.getText().equals(mContext.getString(R.string.btInventory))) {// 识别标签
+        if (BtInventory.getText().equals(mContext.getString(R.string.btInventory))) {
             switch (inventoryFlag) {
-                case 0:// 单步
+                case 0:// 단일 스캔
                     startTime = SystemClock.elapsedRealtime();
                     UHFTAGInfo uhftagInfo = mContext.mReader.inventorySingleTag();
                     if (uhftagInfo != null) {
                         addDataToList(uhftagInfo);
                         setTotalTime();
                         mContext.playSound(1);
+                        
+                        // AWS IoT로 단일 스캔 이벤트 발송
+                        if (cbAutoPublish == null || cbAutoPublish.isChecked()) {
+                            publishRfidEvent(uhftagInfo);
+                        }
                     } else {
                         mContext.showToast(R.string.uhf_msg_inventory_fail);
-//					mContext.playSound(2);
                     }
                     break;
-                case 1:// 单标签循环
+                case 1:// 연속 스캔
                     mContext.mReader.setInventoryCallback(new IUHFInventoryCallback() {
                         @Override
                         public void callback(UHFTAGInfo uhftagInfo) {
@@ -394,7 +565,6 @@ public class UHFReadTagFragment extends KeyDwonFragment {
                     InventoryParameter inventoryParameter = new InventoryParameter();
                     inventoryParameter.setResultData(new InventoryParameter.ResultData().setNeedPhase(cbPhase.isChecked()));
                     if (mContext.mReader.startInventoryTag(inventoryParameter)) {
-                        //--
                         String time = etTime.getText().toString();
                         if (time.length() > 0 && time.startsWith(".")) {
                             etTime.setText("");
@@ -408,8 +578,7 @@ public class UHFReadTagFragment extends KeyDwonFragment {
                         }
                         handler.removeMessages(MSG_STOP);
                         handler.sendEmptyMessageDelayed(MSG_STOP, maxRunTime);
-                        Log.i(TAG, "maxRunTime maxRunTime=" + maxRunTime);
-                        //--
+                        Log.i(TAG, "maxRunTime=" + maxRunTime);
 
                         BtInventory.setText(mContext.getString(R.string.title_stop_Inventory));
                         mContext.loopFlag = true;
@@ -424,7 +593,7 @@ public class UHFReadTagFragment extends KeyDwonFragment {
                 default:
                     break;
             }
-        } else {// 停止识别
+        } else {
             stopInventory();
             setTotalTime();
         }
@@ -440,14 +609,10 @@ public class UHFReadTagFragment extends KeyDwonFragment {
         RbInventoryLoop.setEnabled(enabled);
         cbFilter.setEnabled(enabled);
         btnSetFilter.setEnabled(enabled);
-//        BtClear.setEnabled(enabled);
         cbEPC_Tam.setEnabled(enabled);
         cbPhase.setEnabled(enabled);
     }
 
-    /**
-     * 停止识别
-     */
     private void stopInventory() {
         handler.removeMessages(MSG_STOP);
         if (mContext.loopFlag) {
@@ -486,9 +651,7 @@ public class UHFReadTagFragment extends KeyDwonFragment {
         readTag();
     }
 
-
-    //-----------------------------
-
+    // 어댑터 및 기타 클래스들
     public final class ViewHolder {
         public TextView tvTag;
         public TextView tvTagCount;
@@ -548,12 +711,10 @@ public class UHFReadTagFragment extends KeyDwonFragment {
             } else {
                 mContext.selectIndex = select;
             }
-
         }
     }
 
-
-    //*********************************************************
+    // 사운드 스레드
     private Object objectLock = new Object();
     PlaySoundThread playSoundThread = null;
 
@@ -614,5 +775,4 @@ public class UHFReadTagFragment extends KeyDwonFragment {
             }
         }
     }
-
 }

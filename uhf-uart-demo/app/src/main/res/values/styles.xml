@@ -4,7 +4,7 @@
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
-    <style name="AppBaseTheme" parent="@android:style/Theme.Holo">
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
@@ -17,52 +17,59 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
     
-    <style name="ActionBarBaseTheme" parent="android:style/Theme.Holo.Light"> </style>
+    <!-- TQ 시스템용 테마 -->
+    <style name="TQTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#3498db</item>
+        <item name="colorPrimaryDark">#2c3e50</item>
+        <item name="colorAccent">#27ae60</item>
+        <item name="android:windowBackground">#f5f5f5</item>
+    </style>
     
-    <style name="ActionBarBaseTheme1" parent="android:style/Theme.Holo.Light">
+    <style name="ActionBarBaseTheme" parent="Theme.AppCompat.Light"> </style>
+    
+    <style name="ActionBarBaseTheme1" parent="Theme.AppCompat.Light">
         <item name="android:background">@color/white1</item>
         <item name="android:textColor">@drawable/check_text_color</item>
     </style>
     
     
-     <!-- 将自定义的style取名为CustomTheme，父类为Theme.Holo.Light，也就是说默认背景是白底黑字（如果是Theme.Holo，则默认是黑底白字） -->  
-     <style name="CustomTheme" parent="android:style/Theme.Holo.Light">  
-         <!-- 这是item的背景修改，不按时透明，按时显示绿色  -->  
-         <!-- <item name="android:selectableItemBackground">@color/white1</item>  -->  
-         <!-- <item name="android:actionDropDownStyle">@style/MyDropDownNav</item>     
-         <item name="android:dropDownListViewStyle">@style/MyDropDownListView</item>       
-         <item name="android:actionBarTabStyle">@style/MyActionBarTabStyle</item> -->  
-         <item name="android:actionBarTabTextStyle">@style/MyActionBarTabTextStyle</item>  
-         <item name="android:actionBarStyle">@style/MyActionBarStyle</item>
-         <item name="android:homeAsUpIndicator">@drawable/actionbar_back</item> 
+     <!-- 사용자 정의 테마 - AppCompat 버전으로 변경 -->  
+     <style name="CustomTheme" parent="Theme.AppCompat.Light">
+         <item name="colorPrimary">#3498db</item>
+         <item name="colorPrimaryDark">#2c3e50</item>
+         <item name="colorAccent">#27ae60</item>
+         <!-- ActionBar 스타일 -->  
+         <item name="actionBarTabTextStyle">@style/MyActionBarTabTextStyle</item>  
+         <item name="actionBarStyle">@style/MyActionBarStyle</item>
+         <item name="homeAsUpIndicator">@drawable/actionbar_back</item> 
      </style>  
      
-     <style name="MyActionBarStyle" parent="@android:style/Widget.Holo.ActionBar">
+     <style name="MyActionBarStyle" parent="Widget.AppCompat.ActionBar">
         <!-- <item name="android:background">@color/white</item>
         <item name="android:titleTextStyle">@style/MainActivityActionBarTitleTextStyle</item> -->
       
     </style>
    
-     <!-- Tab选项标签背景的样式 -->  
-     <style name="MyActionBarTabStyle" parent="android:style/Widget.Holo.Light.ActionBar.TabView">  
+     <!-- Tab선택 라벨 배경의 스타일 -->  
+     <style name="MyActionBarTabStyle" parent="Widget.AppCompat.ActionBar.TabView">  
           <!-- <item name="android:background">@color/white</item> -->  
      </style>  
    
-     <!-- Tab选项标签字体的样式 -->  
-     <style name="MyActionBarTabTextStyle" parent="android:style/Widget.Holo.Light.ActionBar.TabText">          
+     <!-- Tab선택 라벨 폰트의 스타일 -->  
+     <style name="MyActionBarTabTextStyle" parent="Widget.AppCompat.ActionBar.TabText">          
          <item name="android:textColor">@drawable/check_text_color</item>
          <item name="android:textSize">16sp</item>  
     </style>  
    
-    <!-- 下拉导航外部按钮的样式 -->  
-     <style name="MyDropDownNav" parent="android:style/Widget.Holo.Light.Spinner">  
+    <!-- 드롭다운 네비게이션 외부 버튼의 스타일 -->  
+     <style name="MyDropDownNav" parent="Widget.AppCompat.Spinner">  
          <!-- <item name="android:background">@color/white1</item>  
          <item name="android:popupBackground">@color/white</item>  
          <item name="android:dropDownSelector">@color/white1</item>   -->
      </style>  
        
-     <!-- 下拉导航内部按钮的样式 -->  
-      <style name="MyDropDownListView" parent="android:style/Widget.Holo.ListView.DropDown">  
+     <!-- 드롭다운 네비게이션 내부 버튼의 스타일 -->  
+      <style name="MyDropDownListView" parent="Widget.AppCompat.ListView.DropDown">  
          <!-- <item name="android:listSelector">@color/blue2</item>  -->
     </style>
 

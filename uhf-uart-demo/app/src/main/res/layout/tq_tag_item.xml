@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <!-- EPC ID -->
+    <TextView
+        android:id="@+id/tvEpc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:text="3000012345678900000000FF"
+        android:textSize="14sp"
+        android:textColor="#2c3e50"
+        android:fontFamily="monospace" />
+
+    <!-- 카운트 -->
+    <TextView
+        android:id="@+id/tvCount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="1"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#27ae60"
+        android:gravity="center" />
+
+    <!-- RSSI -->
+    <TextView
+        android:id="@+id/tvRssi"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="-45 dBm"
+        android:textSize="12sp"
+        android:textColor="#7f8c8d"
+        android:gravity="center" />
+
+</LinearLayout>
