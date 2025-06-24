@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.uhf"
     android:versionCode="1"
     android:versionName="1.0">
@@ -24,13 +25,14 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/CustomTheme"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config">
         
         <activity
             android:name="com.example.uhf.activity.TQMainActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:exported="true"
-            android:label="TQ System"
+            android:label="@string/app_name"
             android:theme="@style/TQTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,15 +44,37 @@
             android:name="com.example.uhf.activity.TQActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:exported="false"
-            android:label="TQ 작업"
+            android:label="@string/tq_work"
             android:theme="@style/TQTheme" />
+        
+        <activity
+            android:name=".activity.PickActivity"
+            android:exported="false" />
         
         <activity
             android:name="com.example.uhf.activity.UHFMainActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:exported="true"
-            android:label="@string/app_name">
+            android:label="UHF Scanner">
         </activity>
+        
+        <activity
+            android:name=".activity.PackingActivity"
+            android:exported="false"
+            android:label="Packing"
+            android:theme="@style/TQTheme" />
+        
+        <activity
+            android:name=".activity.DispatchActivity"
+            android:exported="false"
+            android:label="Dispatch"
+            android:theme="@style/TQTheme" />
+        
+        <activity
+            android:name=".activity.BinningActivity"
+            android:exported="false"
+            android:label="Binning"
+            android:theme="@style/TQTheme" />
         
         <receiver
             android:name="com.example.uhf.BootBroadcastReceiver"
@@ -65,6 +89,15 @@
             android:name="com.example.uhf.filebrowser.FileManagerActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true" />
+
+        <!-- Custom Capture Activity for Barcode Scanning -->
+        <activity
+            android:name=".activity.CustomCaptureActivity"
+            android:screenOrientation="portrait"
+            android:stateNotNeeded="true"
+            android:theme="@style/zxing_CaptureTheme"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            tools:replace="screenOrientation" />
 
         <!-- MQTT 서비스 추가 -->
         <service android:name="org.eclipse.paho.android.service.MqttService" />

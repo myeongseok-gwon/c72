@@ -216,6 +216,37 @@ public class AwsIotManager {
         }
     }
     
+    /**
+     * 지정된 토픽으로 메시지 발행
+     */
+    public void publish(String topic, String payload, PublishCallback callback) {
+        if (!isConnected) {
+            Log.w(TAG, "Not connected to AWS IoT. Cannot publish message.");
+            if (callback != null) {
+                callback.onPublishFailure(new Exception("Not connected to AWS IoT"));
+            }
+            return;
+        }
+
+        try {
+            mqttManager.publishString(payload, topic, AWSIotMqttQos.QOS0, new AWSIotMqttMessageDeliveryCallback() {
+                @Override
+                public void statusChanged(MessageDeliveryStatus status, Object userData) {
+                    if (status == MessageDeliveryStatus.Success) {
+                        if (callback != null) callback.onPublishSuccess();
+                    } else {
+                        if (callback != null) callback.onPublishFailure(new Exception("Publish failed: " + status));
+                    }
+                }
+            }, null);
+        } catch (Exception e) {
+            Log.e(TAG, "Publish error", e);
+            if (callback != null) {
+                callback.onPublishFailure(e);
+            }
+        }
+    }
+    
     public boolean isConnected() {
         return isConnected;
     }

@@ -7,60 +7,267 @@
     android:gravity="center"
     android:padding="32dp">
 
-    <!-- 타이틀 -->
+    <!-- 상단 서비스명만 작은 글씨로 -->
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/tvServiceName"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="RFID TQ System"
-        android:textSize="32sp"
+        android:text="Cargoops"
+        android:textSize="14sp"
         android:textStyle="bold"
         android:textColor="#2c3e50"
-        android:layout_marginBottom="48dp" />
+        android:gravity="center"
+        android:layout_marginBottom="4dp" />
 
-    <!-- 버튼 컨테이너 -->
+    <!-- User Info Display -->
+    <TextView
+        android:id="@+id/tvUserInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🧑‍💼 Manager | ID: EMP001"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#2c3e50"
+        android:background="#ecf0f1"
+        android:padding="6dp"
+        android:gravity="center"
+        android:layout_marginBottom="4dp"
+        android:visibility="gone" />
+
+    <!-- Package ID 입력 섹션 -->
     <LinearLayout
+        android:id="@+id/layoutApiKey"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center">
+        android:background="@drawable/card_background"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp">
 
-        <!-- TQ 버튼 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/api_key_input"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#2c3e50"
+            android:layout_marginBottom="6dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="4dp">
+
+            <EditText
+                android:id="@+id/etApiKey"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:hint="@string/api_key_hint"
+                android:textSize="13sp"
+                android:padding="6dp"
+                android:background="@drawable/edittext_background"
+                android:inputType="text" />
+
+            <Button
+                android:id="@+id/btnScanApiKey"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:text="📷"
+                android:background="@drawable/btn_change_api_background"
+                android:layout_marginLeft="4dp" />
+        </LinearLayout>
+
+        <!-- 샘플 계정 리스트 -->
+        <LinearLayout
+            android:id="@+id/layoutSampleAccounts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+            <Button
+                android:id="@+id/btnSampleTQ"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="TQ3101"
+                android:textSize="16sp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginBottom="2dp"/>
+            <Button
+                android:id="@+id/btnSampleBIN"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="BIN0401"
+                android:textSize="16sp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginBottom="2dp"/>
+            <Button
+                android:id="@+id/btnSamplePICK1"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="PICK9999"
+                android:textSize="16sp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginBottom="2dp"/>
+            <Button
+                android:id="@+id/btnSamplePICK2"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="PICK1235"
+                android:textSize="16sp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginBottom="2dp"/>
+            <Button
+                android:id="@+id/btnSamplePACK"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="PACK0123"
+                android:textSize="16sp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginBottom="2dp"/>
+            <Button
+                android:id="@+id/btnSampleDISP"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="DISP9999"
+                android:textSize="16sp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"/>
+        </LinearLayout>
+
         <Button
-            android:id="@+id/btnTQ"
-            android:layout_width="280dp"
-            android:layout_height="80dp"
-            android:text="TQ"
-            android:textSize="24sp"
+            android:id="@+id/btnConfirmApiKey"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:text="@string/confirm"
+            android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:background="@drawable/btn_tq_background"
-            android:layout_marginBottom="24dp"
-            android:elevation="8dp" />
+            android:background="@drawable/btn_confirm_background"
+            android:layout_marginTop="2dp" />
 
-        <!-- BIN 버튼 -->
-        <Button
-            android:id="@+id/btnBIN"
-            android:layout_width="280dp"
-            android:layout_height="80dp"
-            android:text="BIN"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/btn_bin_background"
-            android:layout_marginBottom="24dp"
-            android:elevation="8dp" />
+        <!-- Progress bar for API validation -->
+        <ProgressBar
+            android:id="@+id/progressApiKey"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone" />
 
-        <!-- PICK 버튼 -->
+    </LinearLayout>
+
+    <!-- 메인 기능 버튼 섹션 -->
+    <LinearLayout
+        android:id="@+id/layoutMainButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <!-- 첫 번째 행: TQ, BIN, PICK -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btnTQ"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:text="@string/btn_tq"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/btn_tq_background"
+                android:layout_marginEnd="8dp"
+                android:elevation="6dp" />
+
+            <Button
+                android:id="@+id/btnBIN"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:text="@string/btn_bin"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/btn_bin_background"
+                android:layout_marginHorizontal="4dp"
+                android:elevation="6dp" />
+
+            <Button
+                android:id="@+id/btnPICK"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:text="@string/btn_pick"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/btn_pick_background"
+                android:layout_marginStart="8dp"
+                android:elevation="6dp" />
+
+        </LinearLayout>
+
+        <!-- 두 번째 행: PACK, DISPATCH -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnPACK"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:text="@string/btn_pack"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/btn_pack_background"
+                android:layout_marginEnd="8dp"
+                android:elevation="6dp" />
+
+            <Button
+                android:id="@+id/btnDISPATCH"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:text="@string/btn_dispatch"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/btn_dispatch_background"
+                android:layout_marginStart="8dp"
+                android:elevation="6dp" />
+
+        </LinearLayout>
+
+        <!-- API Key 변경 버튼 -->
         <Button
-            android:id="@+id/btnPICK"
-            android:layout_width="280dp"
-            android:layout_height="80dp"
-            android:text="PICK"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/btn_pick_background"
-            android:elevation="8dp" />
+            android:id="@+id/btnChangeApiKey"
+            android:layout_width="200dp"
+            android:layout_height="45dp"
+            android:text="@string/change_api_key"
+            android:textSize="14sp"
+            android:textColor="#7f8c8d"
+            android:background="@drawable/btn_change_api_background"
+            android:layout_marginTop="24dp"
+            android:elevation="2dp" />
 
     </LinearLayout>
 
@@ -70,12 +277,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginTop="48dp">
+        android:layout_marginTop="32dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="AWS IoT 상태: "
+            android:text="@string/iot_status"
             android:textSize="14sp"
             android:textColor="#7f8c8d" />
 
@@ -83,7 +290,7 @@
             android:id="@+id/tvIotStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="연결 중..."
+            android:text="@string/iot_connecting"
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="#e74c3c" />

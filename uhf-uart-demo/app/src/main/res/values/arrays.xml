@@ -120,4 +120,65 @@
         <item>A</item>
         <item>B</item>
     </string-array>
+    
+    <!-- Missing frequency hop arrays -->
+    <string-array name="arrayFreHop">
+        <item>865.7</item>
+        <item>866.3</item>
+        <item>866.9</item>
+        <item>867.5</item>
+    </string-array>
+    
+    <string-array name="arrayFreHop_us">
+        <item>902.75</item>
+        <item>903.25</item>
+        <item>903.75</item>
+        <item>904.25</item>
+        <item>904.75</item>
+        <item>905.25</item>
+        <item>905.75</item>
+        <item>906.25</item>
+        <item>906.75</item>
+        <item>907.25</item>
+        <item>907.75</item>
+        <item>908.25</item>
+        <item>908.75</item>
+        <item>909.25</item>
+        <item>909.75</item>
+        <item>910.25</item>
+        <item>910.75</item>
+        <item>911.25</item>
+        <item>911.75</item>
+        <item>912.25</item>
+        <item>912.75</item>
+        <item>913.25</item>
+        <item>913.75</item>
+        <item>914.25</item>
+        <item>914.75</item>
+        <item>915.25</item>
+        <item>915.75</item>
+        <item>916.25</item>
+        <item>916.75</item>
+        <item>917.25</item>
+        <item>917.75</item>
+        <item>918.25</item>
+        <item>918.75</item>
+        <item>919.25</item>
+        <item>919.75</item>
+        <item>920.25</item>
+        <item>920.75</item>
+        <item>921.25</item>
+        <item>921.75</item>
+        <item>922.25</item>
+        <item>922.75</item>
+        <item>923.25</item>
+        <item>923.75</item>
+        <item>924.25</item>
+        <item>924.75</item>
+        <item>925.25</item>
+        <item>925.75</item>
+        <item>926.25</item>
+        <item>926.75</item>
+        <item>927.25</item>
+    </string-array>
 </resources>

@@ -27,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TQ 작업"
+            android:text="@string/tq_work"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#2c3e50"
@@ -38,6 +38,21 @@
             android:layout_height="48dp" />
 
     </LinearLayout>
+
+    <!-- User Info Display -->
+    <TextView
+        android:id="@+id/tvUserInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🧑‍💼 Manager | ID: EMP001"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#2c3e50"
+        android:background="#ecf0f1"
+        android:padding="12dp"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone" />
 
     <!-- Package ID 입력 섹션 -->
     <LinearLayout
@@ -53,7 +68,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Package ID 입력"
+            android:text="@string/package_id_input"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#2c3e50"
@@ -71,7 +86,7 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:layout_weight="1"
-                android:hint="Package ID를 입력하세요"
+                android:hint="@string/package_id_hint"
                 android:textSize="16sp"
                 android:padding="16dp"
                 android:background="@drawable/edittext_background"
@@ -81,7 +96,7 @@
                 android:id="@+id/btnScanBarcode"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
-                android:text="📷"
+                android:text="@string/barcode_scan"
                 android:textSize="20sp"
                 android:background="@drawable/btn_change_background" />
 
@@ -91,7 +106,7 @@
             android:id="@+id/btnConfirmPackage"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="확인"
+            android:text="@string/confirm"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
@@ -99,188 +114,115 @@
 
     </LinearLayout>
 
-    <!-- RFID 스캔 섹션 -->
+    <LinearLayout
+        android:id="@+id/layoutPackageInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:background="#f8f8f8"
+        android:padding="16dp"
+        android:layout_marginTop="12dp">
+
+        <TextView android:id="@+id/tvPackageId" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Package ID: " android:textStyle="bold"/>
+        <TextView android:id="@+id/tvProductId" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Product ID: "/>
+        <TextView android:id="@+id/tvStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Status: "/>
+        <TextView android:id="@+id/tvQuantity" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Quantity: "/>
+        <TextView android:id="@+id/tvTqScannedQuantity" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="TQ Scanned: "/>
+        <TextView android:id="@+id/tvWeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weight: "/>
+        <TextView android:id="@+id/tvSize" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Size: "/>
+        <TextView android:id="@+id/tvBreadth" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Breadth: "/>
+        <TextView android:id="@+id/tvHeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Height: "/>
+        <TextView android:id="@+id/tvWidth" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Width: "/>
+        <TextView android:id="@+id/tvStoringOrderId" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Storing Order ID: "/>
+        <Button
+            android:id="@+id/btnQualityCheck"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quality Check Pass"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/btn_confirm_background"
+            android:textColor="#fff"
+            android:textStyle="bold"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+            <Button
+                android:id="@+id/btnQualityCheckFail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quality Check Fail"
+                android:background="@drawable/btn_dispatch_background"
+                android:textColor="#fff"
+                android:textStyle="bold"/>
+            <EditText
+                android:id="@+id/etQualityFailDesc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Enter fail reason..."
+                android:background="@drawable/edittext_background"
+                android:padding="8dp"
+                android:textSize="16sp"
+                android:layout_marginLeft="8dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- RFID Scan Section -->
     <LinearLayout
         android:id="@+id/layoutRfidScan"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@drawable/card_background"
-        android:padding="24dp"
-        android:elevation="4dp"
-        android:visibility="gone">
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="16dp">
 
-        <!-- 현재 Package ID 표시 -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tvQuantityInfo"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="24dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="현재 Package ID: "
-                android:textSize="16sp"
-                android:textColor="#7f8c8d" />
-
-            <TextView
-                android:id="@+id/tvCurrentPackageId"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text=""
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#27ae60" />
-
-            <Button
-                android:id="@+id/btnChangePackage"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="변경"
-                android:textSize="14sp"
-                android:background="@drawable/btn_change_background"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp" />
-
-        </LinearLayout>
-
-        <!-- RFID 스캔 컨트롤 -->
-        <LinearLayout
-            android:layout_width="match_parent"
+            android:text="Quantity: 0"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
+        <TextView
+            android:id="@+id/tvScannedCount"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="24dp">
+            android:text="Scanned: 0"
+            android:textSize="18sp"
+            android:layout_marginBottom="16dp"/>
 
-            <Button
-                android:id="@+id/btnSingleScan"
-                android:layout_width="0dp"
-                android:layout_height="64dp"
-                android:layout_weight="1"
-                android:text="단일 스캔"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:background="@drawable/btn_single_scan_background"
-                android:layout_marginRight="12dp" />
-
-            <Button
-                android:id="@+id/btnLoopScan"
-                android:layout_width="0dp"
-                android:layout_height="64dp"
-                android:layout_weight="1"
-                android:text="연속 스캔"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:background="@drawable/btn_loop_scan_background"
-                android:layout_marginLeft="12dp" />
-
-        </LinearLayout>
-
-        <!-- 스캔 통계 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="스캔 개수"
-                android:textSize="14sp"
-                android:textColor="#7f8c8d"
-                android:gravity="center" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="총 개수"
-                android:textSize="14sp"
-                android:textColor="#7f8c8d"
-                android:gravity="center" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="시간"
-                android:textSize="14sp"
-                android:textColor="#7f8c8d"
-                android:gravity="center" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="24dp">
-
-            <TextView
-                android:id="@+id/tvScanCount"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="0"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#2c3e50"
-                android:gravity="center" />
-
-            <TextView
-                android:id="@+id/tvTotalCount"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="0"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#2c3e50"
-                android:gravity="center" />
-
-            <TextView
-                android:id="@+id/tvScanTime"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="0s"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#2c3e50"
-                android:gravity="center" />
-
-        </LinearLayout>
-
-        <!-- 스캔된 태그 목록 -->
-        <ListView
-            android:id="@+id/lvScannedTags"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@drawable/listview_background"
-            android:divider="#e0e0e0"
-            android:dividerHeight="1dp" />
-
-        <!-- 하단 액션 버튼 -->
         <Button
-            android:id="@+id/btnClearTags"
+            android:id="@+id/btnLoopScan"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="목록 지우기"
-            android:textSize="16sp"
-            android:background="@drawable/btn_clear_background"
-            android:layout_marginTop="16dp" />
-
+            android:layout_height="wrap_content"
+            android:text="Scan"
+            android:background="@drawable/btn_loop_scan_background"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+        <Button
+            android:id="@+id/btnRfidFail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RFID Fail"
+            android:background="@drawable/btn_dispatch_background"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+        <Button
+            android:id="@+id/btnTqComplete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TQ Complete"
+            android:background="@drawable/btn_confirm_background"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            android:enabled="false"/>
     </LinearLayout>
 
 </LinearLayout>
